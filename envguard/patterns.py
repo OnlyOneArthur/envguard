@@ -12,6 +12,7 @@ import re
 PATTERNS = [
     ("aws-access-token", "AWS Access Key", re.compile(r"\b((?:A3T[A-Z0-9]|AKIA|ASIA|ABIA|ACCA)[A-Z2-7]{16})\b"), 3.0),
     ("gcp-api-key", "GCP API Key", re.compile(r"\b(AIza[\w-]{35})\b"), 4.0),
+    ("gemini-api-key", "Google AI Studio (Gemini) API Key", re.compile(r"\b(AQ\.[A-Za-z0-9_-]{40,})\b"), 3.0),
     ("github-pat", "GitHub Personal Access Token", re.compile(r"ghp_[0-9a-zA-Z]{36}"), 3.0),
     ("github-fine-grained-pat", "GitHub Fine-Grained PAT", re.compile(r"github_pat_\w{82}"), 3.0),
     ("github-app-token", "GitHub App Token", re.compile(r"(?:ghu|ghs)_[0-9a-zA-Z]{36}"), 3.0),
