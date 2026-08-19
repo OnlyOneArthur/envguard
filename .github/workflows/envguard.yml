@@ -19,7 +19,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install EnvGuard
-        run: pip install -e .
+        run: pip install .
 
       - name: Scan for secrets
         run: envguard --verbose

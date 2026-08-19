@@ -1,10 +1,10 @@
 """EnvGuard secrets scanner — regex + Shannon entropy engine."""
 
 import math
-import os
 import re
 import subprocess
-from dataclasses import dataclass, field
+import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 from .patterns import PATTERNS, SKIP_EXTENSIONS, SKIP_DIRS
@@ -42,11 +42,18 @@ def _should_skip(path: Path) -> bool:
 
 
 def scan_text(text: str, filepath: str = "<string>") -> list[Finding]:
-    """Scan text content for secrets. Returns list of findings."""
+    """Scan text content for secrets. Returns list of findings.
+    
+    Line-based scan for most patterns. Full-text scan for multi-line patterns
+    like private key blocks that span multiple lines.
+    """
     findings = []
     lines = text.splitlines()
     for line_no, line in enumerate(lines, 1):
         for pid, desc, regex, entropy_thresh in PATTERNS:
+            # Skip multi-line patterns in line scan — handled below
+            if pid == "private-key":
+                continue
             for m in regex.finditer(line):
                 secret = m.group(0)
                 ent = shannon_entropy(secret)
@@ -60,6 +67,26 @@ def scan_text(text: str, filepath: str = "<string>") -> list[Finding]:
                     secret=secret,
                     entropy=round(ent, 2),
                 ))
+
+    # Full-text scan for multi-line patterns (private key blocks)
+    for pid, desc, regex, entropy_thresh in PATTERNS:
+        if pid != "private-key":
+            continue
+        for m in regex.finditer(text):
+            secret = m.group(0)
+            ent = shannon_entropy(secret)
+            if entropy_thresh is not None and ent < entropy_thresh:
+                continue
+            # Find which line the match starts on
+            start_line = text[:m.start()].count("\n") + 1
+            findings.append(Finding(
+                file=filepath,
+                line=start_line,
+                pattern_id=pid,
+                description=desc,
+                secret=secret,
+                entropy=round(ent, 2),
+            ))
     return findings
 
 
@@ -67,12 +94,19 @@ def scan_path(root: str, verbose: bool = False) -> list[Finding]:
     """Scan all files under root directory recursively."""
     findings = []
     root_path = Path(root)
+    if not root_path.is_dir():
+        print(f"Error: '{root}' is not a directory.", file=sys.stderr)
+        return findings
+    # ponytail: 10MB file size cap, increase if scanning repos with large legit text files
+    MAX_FILE_SIZE = 10 * 1024 * 1024
     for path in root_path.rglob("*"):
         if not path.is_file():
             continue
         if _should_skip(path):
             continue
         try:
+            if path.stat().st_size > MAX_FILE_SIZE:
+                continue
             text = path.read_text(encoding="utf-8", errors="ignore")
         except Exception:
             continue
@@ -90,13 +124,14 @@ def scan_git_history(root: str, verbose: bool = False) -> list[Finding]:
     Upgrade path: use git log --diff-filter with rev range for incremental scans.
     """
     findings = []
+    seen = set()  # dedup by (secret, file) — keep earliest commit only
     try:
         result = subprocess.run(
-            ["git", "log", "-p", "--no-color", "-U0"],
+            ["git", "log", "-p", "--no-color", "-U0", "--no-merges"],
             cwd=root,
             capture_output=True,
             text=True,
-            timeout=60,
+            timeout=120,
         )
     except Exception:
         return findings
@@ -108,14 +143,22 @@ def scan_git_history(root: str, verbose: bool = False) -> list[Finding]:
             current_commit = line.split()[1][:12]
         elif line.startswith("+++ b/"):
             current_file = line[6:]
+        elif line.startswith("Binary files"):
+            continue  # skip binary diffs
         elif line.startswith("+") and not line.startswith("+++"):
             content = line[1:]  # strip the leading +
             for pid, desc, regex, entropy_thresh in PATTERNS:
+                if pid == "private-key":
+                    continue  # multi-line patterns can't match single diff lines
                 for m in regex.finditer(content):
                     secret = m.group(0)
+                    key = (secret, current_file)
+                    if key in seen:
+                        continue
                     ent = shannon_entropy(secret)
                     if entropy_thresh is not None and ent < entropy_thresh:
                         continue
+                    seen.add(key)
                     findings.append(Finding(
                         file=current_file,
                         line=0,

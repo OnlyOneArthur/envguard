@@ -7,6 +7,13 @@ import sys
 from .scanner import scan_path, scan_git_history
 
 
+def _redact(secret: str) -> str:
+    """Show first 4 + last 4 chars, redact the middle. Prevents full secret exposure in CI logs."""
+    if len(secret) <= 12:
+        return secret[:4] + "***"
+    return secret[:4] + "***" + secret[-4:]
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="envguard",
@@ -30,7 +37,7 @@ def main():
                 "line": f.line,
                 "pattern": f.pattern_id,
                 "description": f.description,
-                "secret": f.secret[:12] + "..." if len(f.secret) > 12 else f.secret,
+                "secret": _redact(f.secret),
                 "entropy": f.entropy,
                 "commit": f.commit or None,
             }
@@ -44,7 +51,7 @@ def main():
             for f in findings:
                 loc = f"{f.file}:{f.line}" if not f.commit else f"{f.file} @ {f.commit}"
                 print(f"[{f.pattern_id}] {loc} — {f.description}")
-                print(f"  entropy={f.entropy}  secret={f.secret[:20]}{'...' if len(f.secret) > 20 else ''}")
+                print(f"  entropy={f.entropy}  secret={_redact(f.secret)}")
         print(f"\n{len(findings)} finding(s).")
 
     # CI exit code: 1 if secrets found, 0 if clean

@@ -27,9 +27,8 @@ def test_openai_key_detected():
 
 
 def test_private_key_detected():
-    # Private key block spans multiple lines — scan_text is line-based,
-    # so test with a single-line variant that has 64+ chars between markers
-    text = "-----BEGIN RSA PRIVATE KEY----- " + "A" * 100 + " -----END RSA PRIVATE KEY-----"
+    # Real PEM blocks span multiple lines — scan_text does a full-text scan for private-key
+    text = "-----BEGIN RSA PRIVATE KEY-----\n" + "A" * 100 + "\n-----END RSA PRIVATE KEY-----"
     findings = scan_text(text, "id_rsa")
     assert any(f.pattern_id == "private-key" for f in findings), \
         f"Expected private-key, got: {[f.pattern_id for f in findings]}"
