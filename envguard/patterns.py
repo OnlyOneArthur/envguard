@@ -75,6 +75,58 @@ PATTERNS = [
 
     # Tokens
     ("jwt", "JSON Web Token", re.compile(r"\b(ey[a-zA-Z0-9]{17,}\.ey[a-zA-Z0-9/\\_-]{17,}\.(?:[a-zA-Z0-9/\\_-]{10,}={0,2})?)\b"), 3.0),
+
+    # Package registries
+    ("npm-access-token", "NPM Access Token", re.compile(r"\b(npm_[a-z0-9]{36})\b"), 2.0),
+    ("rubygems-api-token", "RubyGems API Token", re.compile(r"\b(rubygems_[a-f0-9]{48})\b"), 2.0),
+    ("clojars-api-token", "Clojars API Token", re.compile(r"\b(CLOJARS_[a-z0-9]{60})\b"), 3.0),
+
+    # DevOps / CI/CD
+    ("gitlab-ptt", "GitLab Pipeline Trigger Token", re.compile(r"\b(glptt-[0-9a-f]{40})\b"), 3.0),
+    ("gitlab-rrt", "GitLab Runner Registration Token", re.compile(r"\b(GR1348941[\w-]{20})\b"), 3.0),
+    ("gitlab-runner-token", "GitLab Runner Auth Token", re.compile(r"\b(glrt-[0-9a-zA-Z_\-]{20})\b"), 3.0),
+    ("gitlab-scim-token", "GitLab SCIM Token", re.compile(r"\b(glsoat-[0-9a-zA-Z_\-]{20})\b"), 3.0),
+    ("gitlab-k8s-agent-token", "GitLab Kubernetes Agent Token", re.compile(r"\b(glagent-[0-9a-zA-Z_\-]{50})\b"), 3.0),
+    ("gitlab-oauth-secret", "GitLab OAuth App Secret", re.compile(r"\b(gloas-[0-9a-zA-Z_\-]{64})\b"), 3.0),
+    ("pulumi-api-token", "Pulumi API Token", re.compile(r"\b(pul-[a-f0-9]{40})\b"), 2.0),
+    ("postman-api-token", "Postman API Token", re.compile(r"\b(PMAK-[a-f0-9]{24}-[a-f0-9]{34})\b"), 3.0),
+    ("heroku-api-key-v2", "Heroku API Key", re.compile(r"\b(HRKU-AA[0-9a-zA-Z_-]{58})\b"), 4.0),
+
+    # Monitoring / Observability
+    ("grafana-service-account-token", "Grafana Service Account Token", re.compile(r"\b(glsa_[A-Za-z0-9]{32}_[A-Fa-f0-9]{8})\b"), 3.0),
+    ("grafana-cloud-token", "Grafana Cloud API Token", re.compile(r"\b(glc_[A-Za-z0-9+/]{32,400}={0,3})\b"), 3.0),
+    ("sentry-user-token", "Sentry User Token", re.compile(r"\b(sntryu_[a-f0-9]{64})\b"), 3.5),
+    ("datadog-token", "Datadog Token", re.compile(r"(?i)[\w.-]{0,50}?(?:datadog)(?:[ \t\w.-]{0,20})[\s'\"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60'\"\s=]{0,5}([a-z0-9]{40})"), 3.0),
+    ("dynatrace-api-token", "Dynatrace API Token", re.compile(r"\b(dt0c01\.[a-z0-9]{24}\.[a-z0-9]{64})\b"), 4.0),
+
+    # E-commerce / Payments extended
+    ("shopify-access-token", "Shopify Access Token", re.compile(r"\b(shpat_[a-fA-F0-9]{32})\b"), 2.0),
+    ("shopify-custom-token", "Shopify Custom Access Token", re.compile(r"\b(shpca_[a-fA-F0-9]{32})\b"), 2.0),
+    ("shopify-private-token", "Shopify Private App Token", re.compile(r"\b(shppa_[a-fA-F0-9]{32})\b"), 2.0),
+    ("shopify-shared-secret", "Shopify Shared Secret", re.compile(r"\b(shpss_[a-fA-F0-9]{32})\b"), 2.0),
+    ("square-access-token", "Square Access Token", re.compile(r"\b((?:EAAA|sq0atp-)[\w-]{22,60})\b"), 2.0),
+
+    # Cloud / Infrastructure extended
+    ("digitalocean-access-token", "DigitalOcean OAuth Access Token", re.compile(r"\b(doo_v1_[a-f0-9]{64})\b"), 3.0),
+    ("digitalocean-refresh-token", "DigitalOcean OAuth Refresh Token", re.compile(r"\b(dor_v1_[a-f0-9]{64})\b"), 3.0),
+    ("alibaba-access-key-id", "Alibaba Cloud AccessKey ID", re.compile(r"\b(LTAI[a-z0-9]{20})\b"), 2.0),
+    ("flyio-access-token", "Fly.io Access Token", re.compile(r"\b((?:fo1_[\w-]{43}|fm1[ar]_[a-zA-Z0-9+/]{100,}={0,3}|fm2_[a-zA-Z0-9+/]{100,}={0,3}))\b"), 4.0),
+
+    # Databases / Data
+    ("databricks-api-token", "Databricks API Token", re.compile(r"\b(dapi[a-f0-9]{32}(?:-\d)?)\b"), 3.0),
+    ("planetscale-api-token", "PlanetScale API Token", re.compile(r"\b(pscale_tkn_[\w=\.-]{32,64})\b"), 3.0),
+    ("planetscale-password", "PlanetScale Password", re.compile(r"\b(pscale_pw_[\w=\.-]{32,64})\b"), 3.0),
+    ("clickhouse-cloud-key", "ClickHouse Cloud API Secret Key", re.compile(r"\b(4b1d[A-Za-z0-9]{38})\b"), 3.0),
+
+    # SaaS / Productivity
+    ("airtable-pat", "Airtable Personal Access Token", re.compile(r"\b(pat[a-zA-Z0-9]{14}\.[a-f0-9]{64})\b"), 3.0),
+    ("doppler-api-token", "Doppler API Token", re.compile(r"\b(dp\.pt\.[a-z0-9]{43})\b"), 2.0),
+    ("easypost-api-token", "EasyPost API Token", re.compile(r"\b(EZAK[a-z0-9]{54})\b"), 3.0),
+    ("easypost-test-token", "EasyPost Test API Token", re.compile(r"\b(EZTK[a-z0-9]{54})\b"), 3.0),
+
+    # Artifactory / Registry
+    ("artifactory-api-key", "Artifactory API Key", re.compile(r"\b(AKCp[A-Za-z0-9]{69})\b"), 4.5),
+    ("artifactory-token", "Artifactory Reference Token", re.compile(r"\b(cmVmd[A-Za-z0-9]{59})\b"), 4.5),
 ]
 
 # Files to skip entirely (binary, lock files, etc.)
