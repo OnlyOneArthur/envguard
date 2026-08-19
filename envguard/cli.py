@@ -24,12 +24,16 @@ def main():
     parser.add_argument("--json", action="store_true", help="Output findings as JSON")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show per-file scan progress")
     parser.add_argument("--ignore", action="append", default=[], help="Paths to exclude from scan (repeatable)")
+    parser.add_argument("--show-secret", action="store_true", help="Show full secrets in output (default: redacted)")
     args = parser.parse_args()
 
     findings = scan_path(args.path, verbose=args.verbose, ignore=args.ignore)
 
     if args.history:
         findings.extend(scan_git_history(args.path, verbose=args.verbose))
+
+    def fmt_secret(s):
+        return s if args.show_secret else _redact(s)
 
     if args.json:
         out = [
@@ -38,7 +42,7 @@ def main():
                 "line": f.line,
                 "pattern": f.pattern_id,
                 "description": f.description,
-                "secret": _redact(f.secret),
+                "secret": fmt_secret(f.secret),
                 "entropy": f.entropy,
                 "commit": f.commit or None,
             }
@@ -52,7 +56,7 @@ def main():
             for f in findings:
                 loc = f"{f.file}:{f.line}" if not f.commit else f"{f.file} @ {f.commit}"
                 print(f"[{f.pattern_id}] {loc} — {f.description}")
-                print(f"  entropy={f.entropy}  secret={_redact(f.secret)}")
+                print(f"  entropy={f.entropy}  secret={fmt_secret(f.secret)}")
         print(f"\n{len(findings)} finding(s).")
 
     # CI exit code: 1 if secrets found, 0 if clean
