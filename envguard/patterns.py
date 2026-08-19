@@ -46,7 +46,7 @@ PATTERNS = [
 
     # Infrastructure / BaaS
     ("digitalocean-pat", "DigitalOcean PAT", re.compile(r"\b(dop_v1_[a-f0-9]{64})\b"), 3.0),
-    ("supabase-key", "Supabase Key", re.compile(r"\b((?:sbp_(?:pub|sec|svc)_[a-zA-Z0-9]{40,})|(?:eyJ[a-zA-Z0-9_\-]{20,}\.[a-zA-Z0-9_\-]{20,}\.[a-zA-Z0-9_\-]{20,}))\b"), 3.0),
+    ("supabase-key", "Supabase Key", re.compile(r"\b(sbp_(?:pub|sec|svc_)?[a-zA-Z0-9]{36,})\b"), 3.0),
     ("firebase-key", "Firebase Service Account Key", re.compile(r"\b(AIza[0-9A-Za-z_\-]{35})\b"), 4.0),
     ("clerk-secret-key", "Clerk Secret Key", re.compile(r"\bsk_(?:test|live)_[a-zA-Z0-9]{40,}\b"), 3.0),
     ("twilio-api-key", "Twilio API Key", re.compile(r"\bSK[0-9a-fA-F]{32}\b"), 3.0),
