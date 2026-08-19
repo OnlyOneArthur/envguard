@@ -23,9 +23,10 @@ def main():
     parser.add_argument("--history", action="store_true", help="Also scan git commit diffs")
     parser.add_argument("--json", action="store_true", help="Output findings as JSON")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show per-file scan progress")
+    parser.add_argument("--ignore", action="append", default=[], help="Paths to exclude from scan (repeatable)")
     args = parser.parse_args()
 
-    findings = scan_path(args.path, verbose=args.verbose)
+    findings = scan_path(args.path, verbose=args.verbose, ignore=args.ignore)
 
     if args.history:
         findings.extend(scan_git_history(args.path, verbose=args.verbose))

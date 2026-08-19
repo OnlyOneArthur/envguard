@@ -90,7 +90,7 @@ def scan_text(text: str, filepath: str = "<string>") -> list[Finding]:
     return findings
 
 
-def scan_path(root: str, verbose: bool = False) -> list[Finding]:
+def scan_path(root: str, verbose: bool = False, ignore: list[str] | None = None) -> list[Finding]:
     """Scan all files under root directory recursively."""
     findings = []
     root_path = Path(root)
@@ -99,10 +99,13 @@ def scan_path(root: str, verbose: bool = False) -> list[Finding]:
         return findings
     # ponytail: 10MB file size cap, increase if scanning repos with large legit text files
     MAX_FILE_SIZE = 10 * 1024 * 1024
+    ignore_paths = {Path(p).resolve() for p in (ignore or [])}
     for path in root_path.rglob("*"):
         if not path.is_file():
             continue
         if _should_skip(path):
+            continue
+        if any(path.resolve() == ip or ip in path.resolve().parents for ip in ignore_paths):
             continue
         try:
             if path.stat().st_size > MAX_FILE_SIZE:
