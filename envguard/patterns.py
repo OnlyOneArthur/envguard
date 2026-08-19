@@ -45,6 +45,8 @@ PATTERNS = [
     ("sendgrid-api-key", "SendGrid API Key", re.compile(r"\bSG\.[a-zA-Z0-9_\-]{22}\.[a-zA-Z0-9_\-]{43}\b"), 3.0),
     ("mailgun-api-key", "Mailgun API Key", re.compile(r"(?i)[\w.-]{0,50}?(?:mailgun)(?:[ \t\w.-]{0,20})[\s'\"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60'\"\s=]{0,5}(key-[a-zA-Z0-9]{32})"), None),
     ("resend-api-key", "Resend API Key", re.compile(r"\bre_[a-zA-Z0-9]{8,}\b"), 3.0),
+    ("postmark-token", "Postmark/Ollama API Token", re.compile(r"\b([a-f0-9]{32}\.[A-Za-z0-9]{20,})\b"), 3.0),
+    ("clickup-token", "ClickUp Personal Token", re.compile(r"\bpk_[a-zA-Z0-9_\-]{20,}\b"), 3.0),
 
     # Payments
     ("stripe-access-token", "Stripe Access Token", re.compile(r"\b((?:sk|rk)_(?:test|live|prod)_[a-zA-Z0-9]{10,99})\b"), 2.0),
